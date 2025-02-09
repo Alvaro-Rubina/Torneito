@@ -22,8 +22,5 @@ public class League {
     private String logo;
 
     @OneToMany(mappedBy = "league")
-    private List<Team> teams;
-
-    @OneToMany(mappedBy = "league")
     private List<Season> seasons;
 }
