@@ -7,8 +7,7 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 @Builder
 @Entity
 public class Country {
@@ -19,21 +18,15 @@ public class Country {
     private Long id;
 
     private String name;
-    private String nationalTeamName;
     private String flag;
-    private String logo;
 
     @Enumerated(EnumType.STRING)
     private Continent continent;
 
-    @OneToMany(mappedBy = "country")
+    @OneToMany
     private List<League> leagues;
 
-    @OneToMany(mappedBy = "country")
+    @OneToMany
     private List<Team> teams;
-
-    @ManyToOne
-    @JoinColumn(name = "confederation_id")
-    private Confederation confederation;
 
 }

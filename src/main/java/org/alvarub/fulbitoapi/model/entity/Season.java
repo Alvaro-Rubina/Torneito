@@ -3,10 +3,11 @@ package org.alvarub.fulbitoapi.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 @Builder
 @Entity
 public class Season {
@@ -16,9 +17,9 @@ public class Season {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer year;
+    private String code; // Ejemplo: ARG-2021
+    private Long year;
 
-    @ManyToOne
-    @JoinColumn(name = "league_id")
-    private League league;
+    @OneToMany
+    private List<Team> teams;
 }

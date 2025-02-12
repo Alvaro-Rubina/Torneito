@@ -19,16 +19,4 @@ public class Team {
     private String name;
     private String logo;
 
-    @ManyToOne
-    @JoinColumn(name = "country_id")
-    private Country country;
-
-    @ManyToOne
-    @JoinColumn(name = "confederation_id")
-    private Confederation confederation;
-
-    @ManyToOne
-    @JoinColumn(name = "league_id")
-    private League league;
-
 }

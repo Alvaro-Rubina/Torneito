@@ -7,8 +7,7 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 @Builder
 @Entity
 public class League {
@@ -21,6 +20,7 @@ public class League {
     private String name;
     private String logo;
 
-    @OneToMany(mappedBy = "league")
+
+    @OneToMany
     private List<Season> seasons;
 }

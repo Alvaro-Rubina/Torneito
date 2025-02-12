@@ -7,8 +7,7 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 @Builder
 @Entity
 public class Confederation {
@@ -17,13 +16,12 @@ public class Confederation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String logo;
 
-    @OneToMany(mappedBy = "confederation")
+    @OneToMany
     private List<Country> countries;
 
-    @OneToMany(mappedBy = "confederation")
+    @OneToMany
     private List<Team> teams;
 }
