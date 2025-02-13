@@ -13,5 +13,5 @@ public class SeasonResponseDTO {
     //
     private String code; // Ejemplo: ARG-2021
     private Long year;
-    private List<TeamResponseDTO> teams;
+    private List<TeamDTO> teams;
 }

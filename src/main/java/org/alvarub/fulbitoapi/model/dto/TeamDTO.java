@@ -6,7 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-
 public class TeamDTO {
 
     private String name;
