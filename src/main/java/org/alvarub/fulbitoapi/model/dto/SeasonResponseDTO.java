@@ -1,5 +1,6 @@
 package org.alvarub.fulbitoapi.model.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.List;
@@ -11,8 +12,15 @@ import java.util.List;
 public class SeasonResponseDTO {
 
     //
+    @Schema(example = "1", description = "ID de la temporada")
     private Long id;
-    private String code; // Ejemplo: ARG-2021
+
+    @Schema(example = "ARG-2024", description = "Codigo de la temporada")
+    private String code; // Ejemplo: ARG-2024
+
+    @Schema(example = "2024", description = "Año de la temporada")
     private Long year;
+
+    @Schema(description = "Lista de equipos presentes en la temporada")
     private List<TeamResponseDTO> teams;
 }
