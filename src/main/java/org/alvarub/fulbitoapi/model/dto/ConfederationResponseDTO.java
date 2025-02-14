@@ -11,6 +11,7 @@ import java.util.List;
 public class ConfederationResponseDTO {
 
     //
+    private Long id;
     private String name;
     private String logo;
     private List<CountryResponseDTO> countries;

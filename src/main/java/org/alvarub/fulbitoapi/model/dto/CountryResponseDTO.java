@@ -11,6 +11,7 @@ import java.util.List;
 public class CountryResponseDTO {
 
     //
+    private Long id;
     private String name;
     private String flag;
     private String continent;

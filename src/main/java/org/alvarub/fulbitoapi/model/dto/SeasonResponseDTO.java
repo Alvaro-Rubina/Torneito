@@ -11,6 +11,7 @@ import java.util.List;
 public class SeasonResponseDTO {
 
     //
+    private Long id;
     private String code; // Ejemplo: ARG-2021
     private Long year;
     private List<TeamDTO> teams;
