@@ -13,6 +13,7 @@ public class TeamDTO {
     @Schema(example = "Boca Juniors") @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
-    @Schema(example = "https://upload.wikimedia.org/wikipedia/commons/c/c9/Boca_escudo.png") @NotBlank(message = "El url del logo (escudo) es obligatorio")
+    @Schema(example = "https://upload.wikimedia.org/wikipedia/commons/c/c9/Boca_escudo.png")
+    @NotBlank(message = "El url del logo (escudo) es obligatorio")
     private String logo;
 }

@@ -89,8 +89,8 @@ public class SeasonController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<String> editSeason(@Parameter(description = "ID de la temporada", example = "1")
-                               @PathVariable Long id,
-                           @Valid @RequestBody SeasonDTO seasonDTO) {
+                                             @PathVariable Long id,
+                                             @Valid @RequestBody SeasonDTO seasonDTO) {
         seasonService.editSeason(id, seasonDTO);
         return new ResponseEntity<>("Edicion exitosa", HttpStatus.OK);
     }
