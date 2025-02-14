@@ -17,7 +17,7 @@ public class TeamService {
     @Autowired
     private TeamRepository teamRepo;
 
-    public void createTeam(TeamDTO teamDTO) {
+    public void saveTeam(TeamDTO teamDTO) {
         Team team = toEntity(teamDTO);
         teamRepo.save(team);
     }
@@ -33,14 +33,14 @@ public class TeamService {
 
     public TeamResponseDTO findTeamById(Long id) {
         Team team = teamRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Equipo no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Equipo con el id '" + id + "' no encontrado"));
 
         return toDto(team);
     }
 
     public TeamResponseDTO findTeamByName(String name) {
         Team team = teamRepo.findByName(name)
-                .orElseThrow(() -> new NotFoundException("Equipo " + name + " no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Equipo '" + name + "' no encontrado"));
 
         return toDto(team);
     }
@@ -49,8 +49,9 @@ public class TeamService {
         if (teamRepo.existsById(id)) {
             Team team = toEntity(teamDTO);
             team.setId(id);
+            teamRepo.save(team);
         } else {
-            throw new NotFoundException("Equipo con el id " + id + " no encontrado");
+            throw new NotFoundException("Equipo con el id '" + id + "' no encontrado");
         }
     }
 

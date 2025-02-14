@@ -2,7 +2,6 @@ package org.alvarub.fulbitoapi.service;
 
 import org.alvarub.fulbitoapi.model.dto.SeasonDTO;
 import org.alvarub.fulbitoapi.model.dto.SeasonResponseDTO;
-import org.alvarub.fulbitoapi.model.dto.TeamDTO;
 import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Season;
 import org.alvarub.fulbitoapi.model.entity.Team;
@@ -43,14 +42,14 @@ public class SeasonService {
 
     public SeasonResponseDTO findSeasonById(Long id) {
         Season season = seasonRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Temporada con el id " + id + " no encontrada"));
+                .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
 
         return toDto(season);
     }
 
     public SeasonResponseDTO findSeasonByName(String code) {
         Season season = seasonRepo.findByCode(code)
-                .orElseThrow(() -> new NotFoundException("Temporada con el código " + code + " no encontrada"));
+                .orElseThrow(() -> new NotFoundException("Temporada con el código '" + code + "' no encontrada"));
 
         return toDto(season);
     }
@@ -59,8 +58,9 @@ public class SeasonService {
         if (seasonRepo.existsById(id)) {
             Season season = toEntity(seasonDTO);
             season.setId(id);
+            seasonRepo.save(season);
         } else {
-            throw new NotFoundException("Temporada con el id " + id + " no encontrada");
+            throw new NotFoundException("Temporada con el id '" + id + "' no encontrada");
         }
     }
 
@@ -70,7 +70,7 @@ public class SeasonService {
 
         for (String team: seasonDTO.getTeams()) {
             teams.add(teamRepo.findByName(team)
-                    .orElseThrow(() -> new NotFoundException("Equipo " + team + " no encontrado")));
+                    .orElseThrow(() -> new NotFoundException("Equipo '" + team + "' no encontrado")));
         }
 
         return Season.builder()
@@ -80,7 +80,7 @@ public class SeasonService {
                 .build();
     }
 
-    private SeasonResponseDTO toDto(Season season) {
+    public SeasonResponseDTO toDto(Season season) {
         List<TeamResponseDTO> teamsResponse = new ArrayList<>();
         for (Team team: season.getTeams()) {
             teamsResponse.add(teamService.toDto(team));

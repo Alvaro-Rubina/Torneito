@@ -13,5 +13,5 @@ public class LeagueDTO {
     //
     private String name;
     private String logo;
-    private List<String> seasons;
+    private List<String> seasons; // El string hace referencia al "code" de la season
 }
