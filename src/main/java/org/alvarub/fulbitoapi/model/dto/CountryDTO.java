@@ -18,7 +18,7 @@ public class CountryDTO {
     @Schema(example = "Argentina") @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
-    @Schema(example = "https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg")
+    @Schema(example = "https://url-de-la-bandera")
     @NotBlank(message = "El url de la bandera es obligatorio")
     private String flag;
 

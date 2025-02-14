@@ -77,7 +77,7 @@ public class CountryController {
         return countryService.findAllCountries();
     }
 
-    @Operation(summary = "Edita un Pais")
+    @Operation(summary = "Edita un pais")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pais editado", content = {
                     @Content(mediaType = "application/json",

@@ -18,7 +18,7 @@ public class LeagueDTO {
     @Schema(example = "Liga Profesional Argentina") @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
-    @Schema(example = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Logo_lpf_afa.png/428px-Logo_lpf_afa.png")
+    @Schema(example = "https://url-del-logo")
     @NotBlank(message = "El url del logo es obligatorio")
     private String logo;
 
