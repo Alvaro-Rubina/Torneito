@@ -40,7 +40,7 @@ public class TeamService {
 
     public TeamResponseDTO findTeamByName(String name) {
         Team team = teamRepo.findByName(name)
-                .orElseThrow(() -> new NotFoundException("Equipo no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Equipo " + name + " no encontrado"));
 
         return toDto(team);
     }
@@ -54,6 +54,7 @@ public class TeamService {
         }
     }
 
+    // Mappers
     private Team toEntity(TeamDTO teamDTO) {
         return Team.builder()
                 .name(teamDTO.getName())
@@ -61,7 +62,7 @@ public class TeamService {
                 .build();
     }
 
-    private TeamResponseDTO toDto(Team team) {
+    public TeamResponseDTO toDto(Team team) {
         return TeamResponseDTO.builder()
                 .id(team.getId())
                 .name(team.getName())
