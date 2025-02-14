@@ -70,6 +70,26 @@ public class CountryService {
         }
     }
 
+    public TeamResponseDTO getRandomTeamByCountry(Long id) {
+        Country country = countryRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("País con el id '" + id + "' no encontrado"));
+        List<Team> teams = country.getTeams();
+        if (teams.isEmpty()) {
+            throw new NotFoundException("No hay equipos disponibles");
+        }
+        int randomIndex = (int) (Math.random() * teams.size());
+        return teamService.toDto(teams.get(randomIndex));
+    }
+
+    public CountryResponseDTO getRandomCountry() {
+        List<Country> countries = countryRepo.findAll();
+        if (countries.isEmpty()) {
+            throw new NotFoundException("No hay países disponibles");
+        }
+        int randomIndex = (int) (Math.random() * countries.size());
+        return toDto(countries.get(randomIndex));
+    }
+
     // Mappers
     private Country toEntity(CountryDTO countryDTO) {
         List<League> leagues = new ArrayList<>();

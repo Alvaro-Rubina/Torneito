@@ -93,4 +93,18 @@ public class TeamController {
         teamService.editTeam(id, teamDTO);
         return new ResponseEntity<>("Edicion exitosa", HttpStatus.OK);
     }
+
+    @Operation(summary = "Obtiene un equipo aleatorio")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Equipo encontrado", content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeamResponseDTO.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "No hay equipos registrados", content = @Content)
+    })
+    @GetMapping("/random") @ResponseBody
+    public ResponseEntity<?> getRandomTeam() {
+        TeamResponseDTO teamResponseDTO = teamService.getRandomTeam();
+        return new ResponseEntity<>(teamResponseDTO, HttpStatus.OK);
+    }
 }

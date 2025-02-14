@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.alvarub.fulbitoapi.model.dto.ConfederationDTO;
 import org.alvarub.fulbitoapi.model.dto.ConfederationResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.CountryResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.service.ConfederationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -93,4 +95,35 @@ public class ConfederationController {
         confederationService.editConfederation(id, confederationDTO);
         return new ResponseEntity<>("Edicion exitosa", HttpStatus.OK);
     }
+
+    @Operation(summary = "Devuelve un pais aleatorio de una confederacion especifica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pais encontrado", content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CountryResponseDTO.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Confederacion o pais no encontrado", content = @Content)
+    })
+    @GetMapping("/random/country/{id}") @ResponseBody
+    public ResponseEntity<?> getRandomCountryByConfederation(@Parameter(description = "ID de la confederacion", example = "1")
+                                                             @PathVariable Long id) {
+        CountryResponseDTO countryResponseDTO = confederationService.getRandomCountryByConfederation(id);
+        return new ResponseEntity<>(countryResponseDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Devuelve un equipo aleatorio de una confederacion especifica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Equipo encontrado", content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CountryResponseDTO.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Confederacion o equipo no encontrado", content = @Content)
+    })
+    @GetMapping("/random/team/{id}") @ResponseBody
+    public ResponseEntity<?> getRandomTeamByConfederation(@Parameter(description = "ID de la confederacion", example = "1")
+                                                             @PathVariable Long id) {
+        TeamResponseDTO teamResponseDTO = confederationService.getRandomTeamByConfederation(id);
+        return new ResponseEntity<>(teamResponseDTO, HttpStatus.OK);
+    }
+
 }

@@ -64,6 +64,17 @@ public class SeasonService {
         }
     }
 
+    public TeamResponseDTO getRandomTeamBySeason(Long id) {
+        Season season = seasonRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
+        List<Team> teams = season.getTeams();
+        if (teams.isEmpty()) {
+            throw new NotFoundException("No hay equipos en la temporada con el id '" + id + "'");
+        }
+        int randomIndex = (int) (Math.random() * teams.size());
+        return teamService.toDto(teams.get(randomIndex));
+    }
+
     // Mappers
     private Season toEntity(SeasonDTO seasonDTO) {
         List<Team> teams = new ArrayList<>();

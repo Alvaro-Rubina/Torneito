@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.alvarub.fulbitoapi.model.dto.SeasonDTO;
 import org.alvarub.fulbitoapi.model.dto.SeasonResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.service.SeasonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -95,4 +96,18 @@ public class SeasonController {
         return new ResponseEntity<>("Edicion exitosa", HttpStatus.OK);
     }
 
+    @Operation(summary = "Devuelve un equipo aleatorio de una temporada especifica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Equipo encontrado", content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeamResponseDTO.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Temporada o equipo no encontrado", content = @Content)
+    })
+    @GetMapping("/random/{id}") @ResponseBody
+    public ResponseEntity<?> getRandomTeamBySeason(@Parameter(description = "ID de la temporada", example = "1")
+                                                   @PathVariable Long id) {
+        TeamResponseDTO teamResponseDTO = seasonService.getRandomTeamBySeason(id);
+        return new ResponseEntity<>(teamResponseDTO, HttpStatus.OK);
+    }
 }

@@ -71,6 +71,28 @@ public class ConfederationService {
         }
     }
 
+    public CountryResponseDTO getRandomCountryByConfederation(Long id) {
+        Confederation confederation = confederationRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
+        List<Country> countries = confederation.getCountries();
+        if (countries.isEmpty()) {
+            throw new NotFoundException("No hay paises disponibles");
+        }
+        int randomIndex = (int) (Math.random() * countries.size());
+        return countryService.toDto(countries.get(randomIndex));
+    }
+
+    public TeamResponseDTO getRandomTeamByConfederation(Long id) {
+        Confederation confederation = confederationRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
+        List<Team> teams = confederation.getTeams();
+        if (teams.isEmpty()) {
+            throw new NotFoundException("No hay equipos disponibles");
+        }
+        int randomIndex = (int) (Math.random() * teams.size());
+        return teamService.toDto(teams.get(randomIndex));
+    }
+
     // Mappers
     private Confederation toEntity(ConfederationDTO confederationDTO) {
         List<Country> countries = new ArrayList<>();

@@ -55,6 +55,15 @@ public class TeamService {
         }
     }
 
+    public TeamResponseDTO getRandomTeam() {
+        List<Team> teams = teamRepo.findAll();
+        if (teams.isEmpty()) {
+            throw new NotFoundException("No hay equipos disponibles");
+        }
+        int randomIndex = (int) (Math.random() * teams.size());
+        return toDto(teams.get(randomIndex));
+    }
+
     // Mappers
     private Team toEntity(TeamDTO teamDTO) {
         return Team.builder()
