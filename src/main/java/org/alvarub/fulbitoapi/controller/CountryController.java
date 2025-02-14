@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.alvarub.fulbitoapi.model.dto.CountryDTO;
 import org.alvarub.fulbitoapi.model.dto.CountryResponseDTO;
-import org.alvarub.fulbitoapi.model.dto.LeagueDTO;
 import org.alvarub.fulbitoapi.service.CountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
