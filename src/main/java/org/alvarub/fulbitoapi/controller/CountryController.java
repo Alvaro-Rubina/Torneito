@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.alvarub.fulbitoapi.model.dto.CountryDTO;
 import org.alvarub.fulbitoapi.model.dto.CountryResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.service.CountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -92,5 +93,34 @@ public class CountryController {
                                               @Valid @RequestBody CountryDTO countryDTO) {
         countryService.editCountry(id, countryDTO);
         return new ResponseEntity<>("Edicion exitosa", HttpStatus.OK);
+    }
+
+    @Operation(summary = "Devuelve un pais aleatorio")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pais encontrado", content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CountryResponseDTO.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "No hay paises registrados", content = @Content)
+    })
+    @GetMapping("/random") @ResponseBody
+    public ResponseEntity<?> getRandomCountry() {
+        CountryResponseDTO countryResponseDTO = countryService.getRandomCountry();
+        return new ResponseEntity<>(countryResponseDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Devuelve un equipo aleatorio de un pais especifico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Equipo encontrado", content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeamResponseDTO.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Pais o equipo no encontrado", content = @Content)
+    })
+    @GetMapping("/random/{id}") @ResponseBody
+    public ResponseEntity<?> getRandomTeamByCountry(@Parameter(description = "ID del pais", example = "1")
+                                                     @PathVariable Long id) {
+        TeamResponseDTO teamResponseDTO = countryService.getRandomTeamByCountry(id);
+        return new ResponseEntity<>(teamResponseDTO, HttpStatus.OK);
     }
 }
