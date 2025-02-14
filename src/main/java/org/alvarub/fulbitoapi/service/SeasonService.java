@@ -47,7 +47,7 @@ public class SeasonService {
         return toDto(season);
     }
 
-    public SeasonResponseDTO findSeasonByName(String code) {
+    public SeasonResponseDTO findSeasonByCode(String code) {
         Season season = seasonRepo.findByCode(code)
                 .orElseThrow(() -> new NotFoundException("Temporada con el código '" + code + "' no encontrada"));
 
