@@ -66,7 +66,7 @@ public class LeagueController {
             @ApiResponse(responseCode = "404", description = "Liga no encontrada", content = @Content)
     })
     @GetMapping("/{name}") @ResponseBody
-    public ResponseEntity<LeagueResponseDTO> findLeagueByName(@Parameter(description = "Nombre de la liga", example = "1")
+    public ResponseEntity<LeagueResponseDTO> findLeagueByName(@Parameter(description = "Nombre de la liga", example = "Liga Profesional Argentina")
                                                             @PathVariable String name) {
         LeagueResponseDTO leagueResponseDTO = leagueService.findLeagueByName(name);
         return new ResponseEntity<>(leagueResponseDTO, HttpStatus.OK);
