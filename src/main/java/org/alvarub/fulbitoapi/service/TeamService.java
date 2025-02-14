@@ -1,12 +1,14 @@
 package org.alvarub.fulbitoapi.service;
 
 import org.alvarub.fulbitoapi.model.dto.TeamDTO;
+import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Team;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,40 +18,55 @@ public class TeamService {
     private TeamRepository teamRepo;
 
     public void createTeam(TeamDTO teamDTO) {
-        Team team = Team.builder()
-                .name(teamDTO.getName())
-                .logo(teamDTO.getLogo())
-                .build();
+        Team team = toEntity(teamDTO);
         teamRepo.save(team);
     }
 
-    public List<Team> findAllTeams() {
-        return teamRepo.findAll();
+    public List<TeamResponseDTO> findAllTeams() {
+        List<Team> teams = teamRepo.findAll();
+        List<TeamResponseDTO> teamsResponse = new ArrayList<>();
+        for (Team team: teams) {
+            teamsResponse.add(toDto(team));
+        }
+        return teamsResponse;
     }
 
-    public TeamDTO findTeamById(Long id) {
+    public TeamResponseDTO findTeamById(Long id) {
         Team team = teamRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Equipo no encontrado"));
 
-        return TeamDTO.builder()
-                .name(team.getName())
-                .logo(team.getLogo())
-                .build();
+        return toDto(team);
     }
 
-    public Team findTeamByName(String name) {
-        return teamRepo.findByName(name)
+    public TeamResponseDTO findTeamByName(String name) {
+        Team team = teamRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException("Equipo no encontrado"));
+
+        return toDto(team);
     }
 
     public void editTeam(Long id, TeamDTO teamDTO) {
-        Team team = teamRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Equipo no encontrado"));
+        if (teamRepo.existsById(id)) {
+            Team team = toEntity(teamDTO);
+            team.setId(id);
+        } else {
+            throw new NotFoundException("Equipo con el id " + id + " no encontrado");
+        }
+    }
 
-        team.setName(teamDTO.getName());
-        team.setLogo(teamDTO.getLogo());
+    private Team toEntity(TeamDTO teamDTO) {
+        return Team.builder()
+                .name(teamDTO.getName())
+                .logo(teamDTO.getLogo())
+                .build();
+    }
 
-        teamRepo.save(team);
+    private TeamResponseDTO toDto(Team team) {
+        return TeamResponseDTO.builder()
+                .id(team.getId())
+                .name(team.getName())
+                .logo(team.getLogo())
+                .build();
     }
 
 }
