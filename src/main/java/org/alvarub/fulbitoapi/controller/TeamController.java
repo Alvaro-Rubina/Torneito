@@ -64,7 +64,7 @@ public class TeamController {
             }),
             @ApiResponse(responseCode = "404", description = "Equipo no encontrado", content = @Content)
     })
-    @GetMapping("/{name}") @ResponseBody
+    @GetMapping("/name/{name}") @ResponseBody
     public ResponseEntity<?> findTeamByName(@Parameter(description = "Nombre del equipo", example = "Boca Juniors")
                                           @PathVariable String name) {
         TeamResponseDTO teamResponseDTO = teamService.findTeamByName(name);

@@ -66,7 +66,7 @@ public class ConfederationController {
             }),
             @ApiResponse(responseCode = "404", description = "Confederacion no encontrada", content = @Content)
     })
-    @GetMapping("/{name}") @ResponseBody
+    @GetMapping("/name/{name}") @ResponseBody
     public ResponseEntity<?> findConfederationByName(@Parameter(description = "Nombre de la confederacion", example = "CONMEBOL")
                                                    @PathVariable String name) {
         ConfederationResponseDTO confederationResponseDTO = confederationService.findConfederationByName(name);

@@ -66,7 +66,7 @@ public class SeasonController {
             }),
             @ApiResponse(responseCode = "404", description = "Temporada no encontrada", content = @Content)
     })
-    @GetMapping("/{code}") @ResponseBody
+    @GetMapping("/code/{code}") @ResponseBody
     public ResponseEntity<?> findSeasonByCode(@Parameter(description = "Codigo de la temporada", example = "ARG-2024")
                                               @PathVariable String code) {
         SeasonResponseDTO seasonResponseDTO = seasonService.findSeasonByCode(code);

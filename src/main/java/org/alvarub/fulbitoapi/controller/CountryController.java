@@ -65,7 +65,7 @@ public class CountryController {
             }),
             @ApiResponse(responseCode = "404", description = "Pais no encontrado", content = @Content)
     })
-    @GetMapping("/{name}") @ResponseBody
+    @GetMapping("/name/{name}") @ResponseBody
     public ResponseEntity<?> findCountryByName(@Parameter(description = "Nombre del pais", example = "Argentina")
                                                               @PathVariable String name) {
         CountryResponseDTO countryResponseDTO = countryService.findCountryByName(name);
