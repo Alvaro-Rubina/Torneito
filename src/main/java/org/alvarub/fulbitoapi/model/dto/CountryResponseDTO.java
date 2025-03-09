@@ -1,6 +1,7 @@
 package org.alvarub.fulbitoapi.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -23,6 +24,10 @@ public class CountryResponseDTO {
 
     @Schema(example = "AMERICA", description = "Continente al que pertenece el pais")
     private String continent;
+
+    @Schema(example = "Conmebol")
+    private String confederationName;
+
 
     @Schema(description = "Ligas asociadas al pais")
     private List<LeagueResponseDTO> leagues;

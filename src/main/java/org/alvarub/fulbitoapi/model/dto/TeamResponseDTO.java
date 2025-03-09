@@ -17,4 +17,7 @@ public class TeamResponseDTO {
 
     @Schema(example = "https://url-del-logo", description = "URL del logo (escudo) del equipo")
     private String logo;
+
+    @Schema(example = "Argentina", description = "País del equipo")
+    private String countrieName;
 }

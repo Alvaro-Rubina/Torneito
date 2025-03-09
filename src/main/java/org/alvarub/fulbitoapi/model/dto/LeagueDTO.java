@@ -22,6 +22,10 @@ public class LeagueDTO {
     @NotBlank(message = "El url del logo es obligatorio")
     private String logo;
 
+    @Schema(example = "Argentina")
+    @NotBlank(message = "El nombre del país es obligatorio")
+    private String countrieName;
+
     @Schema(example = "[\"ARG-2024\", \"ARG-2023\"]") @NotEmpty(message = "La lista de temporadas no puede estar vacía")
     @Size(min = 1, message = "Debe haber al menos una temporada en la lista")
     private List<String> seasons; // El string hace referencia al "code" de la season

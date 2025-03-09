@@ -25,6 +25,10 @@ public class CountryDTO {
     @Schema(example = "America") @NotBlank(message = "El continente es obligatorio")
     private String continent;
 
+    @Schema(example = "Conmebol")
+    @NotBlank(message = "El nombre de la confederacion es obligatorio")
+    private String confederationName;
+
     @Schema(example = "[\"Liga Profesional Argentina\", \"Primera Nacional Argentina\"]") @NotEmpty(message = "La lista de ligas no puede estar vacía")
     @Size(min = 1, message = "Debe haber al menos una liga en la lista")
     private List<String> leagues;

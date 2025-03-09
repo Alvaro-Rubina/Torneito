@@ -16,4 +16,8 @@ public class TeamDTO {
     @Schema(example = "https://url-del-escudo")
     @NotBlank(message = "El url del logo (escudo) es obligatorio")
     private String logo;
+
+    @Schema(example = "Argentina")
+    @NotBlank(message = "El nombre del país es obligatorio")
+    private String countrieName;
 }

@@ -1,6 +1,7 @@
 package org.alvarub.fulbitoapi.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -20,6 +21,9 @@ public class LeagueResponseDTO {
 
     @Schema(example = "https://url-del-logo", description = "URL del logo de la liga")
     private String logo;
+
+    @Schema(example = "Argentina")
+    private String countrieName;
 
     @Schema(description = "Lista de temporadas asociadas a la liga")
     private List<SeasonResponseDTO> seasons;

@@ -2,17 +2,25 @@ package org.alvarub.fulbitoapi.service;
 
 import org.alvarub.fulbitoapi.model.dto.SeasonDTO;
 import org.alvarub.fulbitoapi.model.dto.SeasonResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.TeamDTO;
 import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Season;
 import org.alvarub.fulbitoapi.model.entity.Team;
 import org.alvarub.fulbitoapi.repository.SeasonRepository;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SeasonService {
@@ -87,6 +95,7 @@ public class SeasonService {
         return Season.builder()
                 .code(seasonDTO.getCode())
                 .year(seasonDTO.getYear())
+                .countrieName(seasonDTO.getCountrieName())
                 .teams(teams)
                 .build();
     }
@@ -101,7 +110,46 @@ public class SeasonService {
                 .id(season.getId())
                 .code(season.getCode())
                 .year(season.getYear())
+                .countrieName(season.getCountrieName())
                 .teams(teamsResponse)
                 .build();
+    }
+
+    // Jsoup methods
+    public void scrapeAndSaveSeason(String seasonPath, SeasonDTO seasonDTO) throws IOException {
+        final String BASE_URL = "https://www.bdfutbol.com/";
+        String url = BASE_URL + "es/t/" + seasonPath;
+
+        Document doc = Jsoup.connect(url).get();
+        Elements rows = doc.select("table#classific tbody tr");
+        List<String> teams = new ArrayList<>();
+        List<TeamDTO> teamDTOs = new ArrayList<>();
+
+        // Recorro los equipos y extraigo el nombre y url del escudo
+        for (Element row : rows) {
+            String teamName = row.select("td.text-left a").text();
+            String logoUrl = BASE_URL + row.select("td.fit.pr-0 img").attr("src");
+
+            // Se guarda el nombre del equipo en la lista teams y si el equipo no está en la base de datos, se persiste en esta.
+            if (!teamName.isEmpty()) {
+                teams.add(teamName);
+
+                if (!teamService.existsByName(teamName)) {
+                    TeamDTO teamDTO = TeamDTO.builder().
+                            name(teamName)
+                            .countrieName(seasonDTO.getCountrieName())
+                            .logo(logoUrl)
+                            .build();
+                    teamDTOs.add(teamDTO);
+                }
+            }
+        }
+
+        // Guardo los equipos NUEVOS en la bd
+        teamService.saveAllTeams(teamDTOs);
+
+        // Guardo el dto en la bd
+        seasonDTO.setTeams(teams);
+        this.saveSeason(seasonDTO);
     }
 }

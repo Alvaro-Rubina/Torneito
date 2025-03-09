@@ -108,6 +108,7 @@ public class CountryService {
                 .name(countryDTO.getName())
                 .flag(countryDTO.getFlag())
                 .continent(Continent.valueOf(countryDTO.getContinent()))
+                .confederationName(countryDTO.getConfederationName())
                 .leagues(leagues)
                 .teams(teams)
                 .build();
@@ -129,6 +130,7 @@ public class CountryService {
                 .name(country.getName())
                 .flag(country.getFlag())
                 .continent(String.valueOf(country.getContinent()))
+                .confederationName(country.getConfederationName())
                 .leagues(leaguesResponse)
                 .teams(teamsResponse)
                 .build();

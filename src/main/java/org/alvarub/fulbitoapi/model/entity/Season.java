@@ -19,6 +19,7 @@ public class Season {
 
     private String code; // Ejemplo: ARG-2021
     private Long year;
+    private String countrieName;
 
     @ManyToMany
     private List<Team> teams;
