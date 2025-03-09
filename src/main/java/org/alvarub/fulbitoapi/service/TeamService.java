@@ -6,6 +6,7 @@ import org.alvarub.fulbitoapi.model.entity.Team;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,9 +18,23 @@ public class TeamService {
     @Autowired
     private TeamRepository teamRepo;
 
+    @Cacheable("teams")
+    public boolean existsByName(String name) {
+        return teamRepo.findByName(name).isPresent();
+    }
+
     public void saveTeam(TeamDTO teamDTO) {
+
         Team team = toEntity(teamDTO);
         teamRepo.save(team);
+    }
+
+    public void saveAllTeams(List<TeamDTO> teamsDTO) {
+        List<Team> teams = new ArrayList<>();
+        for (TeamDTO teamDTO: teamsDTO) {
+            teams.add(toEntity(teamDTO));
+        }
+        teamRepo.saveAll(teams);
     }
 
     public List<TeamResponseDTO> findAllTeams() {
