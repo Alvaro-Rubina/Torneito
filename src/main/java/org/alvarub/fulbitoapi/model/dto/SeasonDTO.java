@@ -24,4 +24,8 @@ public class SeasonDTO {
 
     @Schema(example = "[\"Boca Juniors\", \"RiBer Plate\"]") @NotEmpty(message = "La lista de equipos no puede estar vacía")
     private List<String> teams;
+
+    @Schema(example = "Argentina")
+    @NotBlank(message = "El nombre del país es obligatorio")
+    private String countrieName;
 }

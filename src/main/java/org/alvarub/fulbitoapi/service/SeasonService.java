@@ -95,6 +95,7 @@ public class SeasonService {
         return Season.builder()
                 .code(seasonDTO.getCode())
                 .year(seasonDTO.getYear())
+                .countrieName(seasonDTO.getCountrieName())
                 .teams(teams)
                 .build();
     }
@@ -109,6 +110,7 @@ public class SeasonService {
                 .id(season.getId())
                 .code(season.getCode())
                 .year(season.getYear())
+                .countrieName(season.getCountrieName())
                 .teams(teamsResponse)
                 .build();
     }
@@ -133,7 +135,11 @@ public class SeasonService {
                 teams.add(teamName);
 
                 if (!teamService.existsByName(teamName)) {
-                    TeamDTO teamDTO = new TeamDTO(teamName, logoUrl);
+                    TeamDTO teamDTO = TeamDTO.builder().
+                            name(teamName)
+                            .countrieName(seasonDTO.getCountrieName())
+                            .logo(logoUrl)
+                            .build();
                     teamDTOs.add(teamDTO);
                 }
             }
@@ -142,7 +148,7 @@ public class SeasonService {
         // Guardo los equipos NUEVOS en la bd
         teamService.saveAllTeams(teamDTOs);
 
-        // Creo el SeasonDTO y lo guardo en la bd
+        // Guardo el dto en la bd
         seasonDTO.setTeams(teams);
         this.saveSeason(seasonDTO);
     }

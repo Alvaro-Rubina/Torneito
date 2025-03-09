@@ -77,6 +77,7 @@ public class LeagueService {
         return League.builder()
                 .name(leagueDTO.getName())
                 .logo(leagueDTO.getLogo())
+                .countrieName(leagueDTO.getCountrieName())
                 .seasons(seasons)
                 .build();
     }
@@ -91,6 +92,7 @@ public class LeagueService {
                 .id(league.getId())
                 .name(league.getName())
                 .logo(league.getLogo())
+                .countrieName(league.getCountrieName())
                 .seasons(seasonsResponse)
                 .build();
     }
