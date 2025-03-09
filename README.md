@@ -13,3 +13,6 @@ todas las relaciones son unidireccionales para que sea mas sencillo de manejar.
 
 - Una TEMPORADA tiene una lista de EQUIPOS. Aclaracion: Algunos equipos pueden mantenerse en X temporada de una liga y otros no estar en esta ya que descendieron o ascendieron.
   * Ejemplo: La temporada AFA-2024 tiene a Boca, RiBer, San Lorenzo, etc (todos los equpipos que estuvieron en esta liga, ejemplo Riestra que ascendió).
+
+
+TODO: Caching, Spring security
