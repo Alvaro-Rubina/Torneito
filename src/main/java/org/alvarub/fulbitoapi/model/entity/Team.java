@@ -18,5 +18,6 @@ public class Team {
 
     private String name;
     private String logo;
+    private String countrieName;
 
 }

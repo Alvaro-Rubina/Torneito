@@ -24,7 +24,6 @@ public class TeamService {
     }
 
     public void saveTeam(TeamDTO teamDTO) {
-
         Team team = toEntity(teamDTO);
         teamRepo.save(team);
     }
@@ -84,6 +83,7 @@ public class TeamService {
         return Team.builder()
                 .name(teamDTO.getName())
                 .logo(teamDTO.getLogo())
+                .countrieName(teamDTO.getCountrieName())
                 .build();
     }
 
@@ -92,6 +92,7 @@ public class TeamService {
                 .id(team.getId())
                 .name(team.getName())
                 .logo(team.getLogo())
+                .countrieName(team.getCountrieName())
                 .build();
     }
 
