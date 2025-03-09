@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SeasonService {
@@ -113,29 +115,35 @@ public class SeasonService {
 
     // Jsoup methods
     public void scrapeAndSaveSeason(String seasonPath, SeasonDTO seasonDTO) throws IOException {
-        final String BASE_URL = "https://www.bdfutbol.com/es/t/";
-        String url = BASE_URL + seasonPath;
+        final String BASE_URL = "https://www.bdfutbol.com/";
+        String url = BASE_URL + "es/t/" + seasonPath;
 
         Document doc = Jsoup.connect(url).get();
-        Elements teams = doc.select("table#classific tbody tr");
-        List<String> teamNames = new ArrayList<>();
+        Elements rows = doc.select("table#classific tbody tr");
+        List<String> teams = new ArrayList<>();
         List<TeamDTO> teamDTOs = new ArrayList<>();
 
-        // Extraigo el nombre y escudo de cada equipo y los guardo
-        for (Element team : teams) {
-            String teamName = team.select("td.text-left a").text();
-            String logoUrl = "https://www.bdfutbol.com/" + team.select("td.fit.pr-0 img").attr("src");
+        // Recorro los equipos y extraigo el nombre y url del escudo
+        for (Element row : rows) {
+            String teamName = row.select("td.text-left a").text();
+            String logoUrl = BASE_URL + row.select("td.fit.pr-0 img").attr("src");
 
-            if (!teamName.isEmpty() && !logoUrl.isEmpty()){
-                teamNames.add(teamName);
-                TeamDTO teamDTO = new TeamDTO(teamName, logoUrl);
-                teamDTOs.add(teamDTO);
+            // Se guarda el nombre del equipo en la lista teams y si el equipo no está en la base de datos, se persiste en esta.
+            if (!teamName.isEmpty()) {
+                teams.add(teamName);
+
+                if (!teamService.existsByName(teamName)) {
+                    TeamDTO teamDTO = new TeamDTO(teamName, logoUrl);
+                    teamDTOs.add(teamDTO);
+                }
             }
-            teamService.saveAllTeams(teamDTOs);
         }
 
-        // Creo el SeasonDTO y lo guardo
-        seasonDTO.setTeams(teamNames);
+        // Guardo los equipos NUEVOS en la bd
+        teamService.saveAllTeams(teamDTOs);
+
+        // Creo el SeasonDTO y lo guardo en la bd
+        seasonDTO.setTeams(teams);
         this.saveSeason(seasonDTO);
     }
 }
