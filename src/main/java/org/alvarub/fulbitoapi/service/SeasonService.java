@@ -2,15 +2,21 @@ package org.alvarub.fulbitoapi.service;
 
 import org.alvarub.fulbitoapi.model.dto.SeasonDTO;
 import org.alvarub.fulbitoapi.model.dto.SeasonResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.TeamDTO;
 import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Season;
 import org.alvarub.fulbitoapi.model.entity.Team;
 import org.alvarub.fulbitoapi.repository.SeasonRepository;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,5 +109,31 @@ public class SeasonService {
                 .year(season.getYear())
                 .teams(teamsResponse)
                 .build();
+    }
+
+    // Jsoup methods
+    public void scrapeAndSaveSeason(String seasonPath, SeasonDTO seasonDTO) throws IOException {
+        final String BASE_URL = "https://www.bdfutbol.com/es/t/";
+        String url = BASE_URL + seasonPath;
+
+        Document doc = Jsoup.connect(url).get();
+        Elements teams = doc.select("table#classific tbody tr");
+        List<String> teamNames = new ArrayList<>();
+
+        // Extraigo el nombre y escudo de cada equipo y los guardo
+        for (Element team : teams) {
+            String teamName = team.select("td.text-left a").text();
+            String logoUrl = "https://www.bdfutbol.com/" + team.select("td.fit.pr-0 img").attr("src");
+
+            if (!teamName.isEmpty() && !logoUrl.isEmpty()){
+                teamNames.add(teamName);
+                TeamDTO teamDTO = new TeamDTO(teamName, logoUrl);
+                teamService.saveTeam(teamDTO);
+            }
+        }
+
+        // Creo el SeasonDTO y lo guardo
+        seasonDTO.setTeams(teamNames);
+        this.saveSeason(seasonDTO);
     }
 }

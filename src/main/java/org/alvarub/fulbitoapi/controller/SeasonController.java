@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -109,5 +110,23 @@ public class SeasonController {
                                                    @PathVariable Long id) {
         TeamResponseDTO teamResponseDTO = seasonService.getRandomTeamBySeason(id);
         return new ResponseEntity<>(teamResponseDTO, HttpStatus.OK);
+    }
+
+    // Scraping endpoint
+    @Operation(summary = "Registra una temporada junto con sus equipos en la base de datos desde una pagina externa")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Temporada registrada", content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = SeasonDTO.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Parametros invalidos", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Equipo no encontrado", content = @Content)
+    })
+    @PostMapping("/scrape/code/{seasonPath}") @ResponseBody
+    public ResponseEntity<String> scrapeAndSaveSeason(@Parameter(description = "ID de la temporada en la URL de BDFutbol", example = "targ2025-26.html")
+                                                          @PathVariable String seasonPath,
+                                                      @Valid @RequestBody SeasonDTO seasonDTO) throws IOException {
+        seasonService.scrapeAndSaveSeason(seasonPath, seasonDTO);
+        return new ResponseEntity<>("Registro exitoso", HttpStatus.CREATED);
     }
 }
