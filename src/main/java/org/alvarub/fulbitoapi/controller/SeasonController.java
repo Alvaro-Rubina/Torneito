@@ -120,7 +120,8 @@ public class SeasonController {
                             schema = @Schema(implementation = SeasonDTO.class))
             }),
             @ApiResponse(responseCode = "400", description = "Parametros invalidos", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Equipo no encontrado", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Equipo no encontrado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Error en la URL", content = @Content)
     })
     @PostMapping("/scrape/code/{seasonPath}") @ResponseBody
     public ResponseEntity<String> scrapeAndSaveSeason(@Parameter(description = "ID de la temporada en la URL de BDFutbol", example = "targ2025-26.html")
