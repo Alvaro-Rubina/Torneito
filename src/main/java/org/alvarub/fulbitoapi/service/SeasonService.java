@@ -119,6 +119,7 @@ public class SeasonService {
         Document doc = Jsoup.connect(url).get();
         Elements teams = doc.select("table#classific tbody tr");
         List<String> teamNames = new ArrayList<>();
+        List<TeamDTO> teamDTOs = new ArrayList<>();
 
         // Extraigo el nombre y escudo de cada equipo y los guardo
         for (Element team : teams) {
@@ -128,8 +129,9 @@ public class SeasonService {
             if (!teamName.isEmpty() && !logoUrl.isEmpty()){
                 teamNames.add(teamName);
                 TeamDTO teamDTO = new TeamDTO(teamName, logoUrl);
-                teamService.saveTeam(teamDTO);
+                teamDTOs.add(teamDTO);
             }
+            teamService.saveAllTeams(teamDTOs);
         }
 
         // Creo el SeasonDTO y lo guardo
