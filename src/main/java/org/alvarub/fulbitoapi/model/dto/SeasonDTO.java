@@ -7,13 +7,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-public class SeasonDTO {
+public class SeasonDTO implements Serializable {
 
     //
     @Schema(example = "ARG-2024") @NotBlank(message = "El codigo es obligatorio")

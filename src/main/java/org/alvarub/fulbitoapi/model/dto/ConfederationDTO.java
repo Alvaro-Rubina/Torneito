@@ -6,13 +6,14 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-public class ConfederationDTO   {
+public class ConfederationDTO implements Serializable {
 
     //
     @Schema(example = "CONMEBOL") @NotBlank(message = "El nombre es obligatorio")

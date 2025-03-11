@@ -3,11 +3,13 @@ package org.alvarub.fulbitoapi.model.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serializable;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-public class TeamResponseDTO {
+public class TeamResponseDTO implements Serializable {
 
     @Schema(example = "1", description = "ID del equipo")
     private Long id;

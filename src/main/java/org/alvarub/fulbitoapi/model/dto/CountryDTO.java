@@ -6,13 +6,14 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-public class CountryDTO {
+public class CountryDTO implements Serializable {
 
     //
     @Schema(example = "Argentina") @NotBlank(message = "El nombre es obligatorio")
