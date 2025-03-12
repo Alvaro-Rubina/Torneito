@@ -61,14 +61,33 @@ public class ConfederationService {
     }
 
     public void editConfederation(Long id, ConfederationDTO confederationDTO) {
-        if (confederationRepo.existsById(id)) {
-            Confederation confederation = toEntity(confederationDTO);
-            confederation.setId(id);
-            confederationRepo.save(confederation);
+        Confederation existingConfederation = confederationRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
 
-        } else {
-            throw new NotFoundException("Confederacion con el id '" + id + "' no encontrada");
+        if (confederationDTO.getName() != null) {
+            existingConfederation.setName(confederationDTO.getName());
         }
+        if (confederationDTO.getLogo() != null) {
+            existingConfederation.setLogo(confederationDTO.getLogo());
+        }
+        if (confederationDTO.getCountries() != null && !confederationDTO.getCountries().isEmpty()) {
+            List<Country> countries = new ArrayList<>();
+            for (String countryName : confederationDTO.getCountries()) {
+                countries.add(countryRepo.findByName(countryName)
+                        .orElseThrow(() -> new NotFoundException("País con el nombre '" + countryName + "' no encontrado")));
+            }
+            existingConfederation.setCountries(countries);
+        }
+        if (confederationDTO.getTeams() != null && !confederationDTO.getTeams().isEmpty()) {
+            List<Team> teams = new ArrayList<>();
+            for (String teamName : confederationDTO.getTeams()) {
+                teams.add(teamRepo.findByName(teamName)
+                        .orElseThrow(() -> new NotFoundException("Equipo con el nombre '" + teamName + "' no encontrado")));
+            }
+            existingConfederation.setTeams(teams);
+        }
+
+        confederationRepo.save(existingConfederation);
     }
 
     public CountryResponseDTO getRandomCountryByConfederation(Long id) {

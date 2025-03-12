@@ -61,13 +61,28 @@ public class SeasonService {
     }
 
     public void editSeason(Long id, SeasonDTO seasonDTO) {
-        if (seasonRepo.existsById(id)) {
-            Season season = toEntity(seasonDTO);
-            season.setId(id);
-            seasonRepo.save(season);
-        } else {
-            throw new NotFoundException("Temporada con el id '" + id + "' no encontrada");
+        Season existingSeason = seasonRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
+
+        if (seasonDTO.getCode() != null) {
+            existingSeason.setCode(seasonDTO.getCode());
         }
+        if (seasonDTO.getYear() != null) {
+            existingSeason.setYear(seasonDTO.getYear());
+        }
+        if (seasonDTO.getCountrieName() != null) {
+            existingSeason.setCountrieName(seasonDTO.getCountrieName());
+        }
+        if (seasonDTO.getTeams() != null && !seasonDTO.getTeams().isEmpty()) {
+            List<Team> teams = new ArrayList<>();
+            for (String teamName : seasonDTO.getTeams()) {
+                teams.add(teamRepo.findByName(teamName)
+                        .orElseThrow(() -> new NotFoundException("Equipo '" + teamName + "' no encontrado")));
+            }
+            existingSeason.setTeams(teams);
+        }
+
+        seasonRepo.save(existingSeason);
     }
 
     public TeamResponseDTO getRandomTeamBySeason(Long id) {

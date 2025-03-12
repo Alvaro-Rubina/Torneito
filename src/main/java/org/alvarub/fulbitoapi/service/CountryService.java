@@ -61,13 +61,39 @@ public class CountryService {
     }
 
     public void editCountry(Long id, CountryDTO countryDTO) {
-        if (countryRepo.existsById(id)) {
-            Country country = toEntity(countryDTO);
-            country.setId(id);
-            countryRepo.save(country);
-        } else {
-            throw new NotFoundException("País con el id '" + id + "' no encontrado");
+        Country existingCountry = countryRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("País con el id '" + id + "' no encontrado"));
+
+        if (countryDTO.getName() != null) {
+            existingCountry.setName(countryDTO.getName());
         }
+        if (countryDTO.getFlag() != null) {
+            existingCountry.setFlag(countryDTO.getFlag());
+        }
+        if (countryDTO.getContinent() != null) {
+            existingCountry.setContinent(Continent.valueOf(countryDTO.getContinent()));
+        }
+        if (countryDTO.getConfederationName() != null) {
+            existingCountry.setConfederationName(countryDTO.getConfederationName());
+        }
+        if (countryDTO.getLeagues() != null && !countryDTO.getLeagues().isEmpty()) {
+            List<League> leagues = new ArrayList<>();
+            for (String leagueName : countryDTO.getLeagues()) {
+                leagues.add(leagueRepo.findByName(leagueName)
+                        .orElseThrow(() -> new NotFoundException("Liga con el nombre '" + leagueName + "' no encontrada")));
+            }
+            existingCountry.setLeagues(leagues);
+        }
+        if (countryDTO.getTeams() != null && !countryDTO.getTeams().isEmpty()) {
+            List<Team> teams = new ArrayList<>();
+            for (String teamName : countryDTO.getTeams()) {
+                teams.add(teamRepo.findByName(teamName)
+                        .orElseThrow(() -> new NotFoundException("Equipo con el nombre '" + teamName + "' no encontrado")));
+            }
+            existingCountry.setTeams(teams);
+        }
+
+        countryRepo.save(existingCountry);
     }
 
     public TeamResponseDTO getRandomTeamByCountry(Long id) {
