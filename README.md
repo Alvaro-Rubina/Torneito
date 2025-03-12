@@ -1,1 +1,1 @@
-TODO: Caching, Spring security
+TODO: Caching, Spring security, logger
