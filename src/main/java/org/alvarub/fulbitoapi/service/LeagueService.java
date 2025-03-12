@@ -9,6 +9,9 @@ import org.alvarub.fulbitoapi.repository.LeagueRepository;
 import org.alvarub.fulbitoapi.repository.SeasonRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,12 +29,14 @@ public class LeagueService {
     @Autowired
     private SeasonRepository seasonRepo;
 
+    @CacheEvict(value = "leagues", allEntries = true)
     public void saveLeague(LeagueDTO leagueDTO) {
         League league = toEntity(leagueDTO);
         leagueRepo.save(league);
 
     }
 
+    @Cacheable("leagues")
     public List<LeagueResponseDTO> findAllLeagues() {
         List<League> leagues = leagueRepo.findAll();
         List<LeagueResponseDTO> leaguesResponse = new ArrayList<>();
@@ -41,6 +46,7 @@ public class LeagueService {
         return leaguesResponse;
     }
 
+    @Cacheable(value = "leagues", key = "#id")
     public LeagueResponseDTO findLeagueById(Long id) {
         League league = leagueRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Liga con el id '" + id + "' no encontrada"));
@@ -48,6 +54,7 @@ public class LeagueService {
         return toDto(league);
     }
 
+    @Cacheable(value = "leagues", key = "#name")
     public LeagueResponseDTO findLeagueByName(String name) {
         League league = leagueRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException("Liga con el nombre '" + name + "' no encontrada"));
@@ -55,6 +62,7 @@ public class LeagueService {
         return toDto(league);
     }
 
+    @CachePut(value = "leagues", key = "#id")
     public void editLeague(Long id, LeagueDTO leagueDTO) {
         League existingLeague = leagueRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Liga con el id '" + id + "' no encontrada"));

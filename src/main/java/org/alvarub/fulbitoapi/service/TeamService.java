@@ -6,6 +6,8 @@ import org.alvarub.fulbitoapi.model.entity.Team;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +20,17 @@ public class TeamService {
     @Autowired
     private TeamRepository teamRepo;
 
-    @Cacheable("teams")
     public boolean existsByName(String name) {
         return teamRepo.findByName(name).isPresent();
     }
 
+    @CacheEvict(value = "teams", allEntries = true)
     public void saveTeam(TeamDTO teamDTO) {
         Team team = toEntity(teamDTO);
         teamRepo.save(team);
     }
 
+    @CacheEvict(value = "teams", allEntries = true)
     public void saveAllTeams(List<TeamDTO> teamsDTO) {
         List<Team> teams = new ArrayList<>();
         for (TeamDTO teamDTO: teamsDTO) {
@@ -36,6 +39,7 @@ public class TeamService {
         teamRepo.saveAll(teams);
     }
 
+    @Cacheable("teams")
     public List<TeamResponseDTO> findAllTeams() {
         List<Team> teams = teamRepo.findAll();
         List<TeamResponseDTO> teamsResponse = new ArrayList<>();
@@ -45,6 +49,7 @@ public class TeamService {
         return teamsResponse;
     }
 
+    @Cacheable(value = "teams", key = "#id")
     public TeamResponseDTO findTeamById(Long id) {
         Team team = teamRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Equipo con el id '" + id + "' no encontrado"));
@@ -52,6 +57,7 @@ public class TeamService {
         return toDto(team);
     }
 
+    @Cacheable(value = "teams", key = "#name")
     public TeamResponseDTO findTeamByName(String name) {
         Team team = teamRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException("Equipo '" + name + "' no encontrado"));
@@ -59,23 +65,31 @@ public class TeamService {
         return toDto(team);
     }
 
+    @CachePut(value = "teams", key = "#id")
     public void editTeam(Long id, TeamDTO teamDTO) {
-        if (teamRepo.existsById(id)) {
-            Team team = toEntity(teamDTO);
-            team.setId(id);
-            teamRepo.save(team);
-        } else {
-            throw new NotFoundException("Equipo con el id '" + id + "' no encontrado");
+        Team existingTeam = teamRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Equipo con el id '" + id + "' no encontrado"));
+
+        if (teamDTO.getName() != null) {
+            existingTeam.setName(teamDTO.getName());
         }
+        if (teamDTO.getLogo() != null) {
+            existingTeam.setLogo(teamDTO.getLogo());
+        }
+        if (teamDTO.getCountrieName() != null) {
+            existingTeam.setCountrieName(teamDTO.getCountrieName());
+        }
+
+        teamRepo.save(existingTeam);
     }
 
     public TeamResponseDTO getRandomTeam() {
-        List<Team> teams = teamRepo.findAll();
+        List<TeamResponseDTO> teams = this.findAllTeams();
         if (teams.isEmpty()) {
             throw new NotFoundException("No hay equipos disponibles");
         }
         int randomIndex = (int) (Math.random() * teams.size());
-        return toDto(teams.get(randomIndex));
+        return teams.get(randomIndex);
     }
 
     // Mappers

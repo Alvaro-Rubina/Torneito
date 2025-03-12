@@ -14,6 +14,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -32,11 +35,13 @@ public class SeasonService {
     @Autowired
     private TeamRepository teamRepo;
 
+    @CacheEvict(value = "seasons", allEntries = true)
     public void saveSeason(SeasonDTO seasonDTO) {
         Season season = toEntity(seasonDTO);
         seasonRepo.save(season);
     }
 
+    @Cacheable("seasons")
     public List<SeasonResponseDTO> findAllSeasons() {
         List<Season> seasons = seasonRepo.findAll();
         List<SeasonResponseDTO> seasonsResponse = new ArrayList<>();
@@ -46,6 +51,7 @@ public class SeasonService {
         return seasonsResponse;
     }
 
+    @Cacheable(value = "seasons", key = "#id")
     public SeasonResponseDTO findSeasonById(Long id) {
         Season season = seasonRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
@@ -53,6 +59,7 @@ public class SeasonService {
         return toDto(season);
     }
 
+    @Cacheable(value = "seasons", key = "#code")
     public SeasonResponseDTO findSeasonByCode(String code) {
         Season season = seasonRepo.findByCode(code)
                 .orElseThrow(() -> new NotFoundException("Temporada con el código '" + code + "' no encontrada"));
@@ -60,6 +67,7 @@ public class SeasonService {
         return toDto(season);
     }
 
+    @CachePut(value = "seasons", key = "#id")
     public void editSeason(Long id, SeasonDTO seasonDTO) {
         Season existingSeason = seasonRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
@@ -86,14 +94,13 @@ public class SeasonService {
     }
 
     public TeamResponseDTO getRandomTeamBySeason(Long id) {
-        Season season = seasonRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
-        List<Team> teams = season.getTeams();
-        if (teams.isEmpty()) {
+        SeasonResponseDTO season = this.findSeasonById(id);
+        List<TeamResponseDTO> teams = season.getTeams();
+        if(teams.isEmpty()) {
             throw new NotFoundException("No hay equipos en la temporada con el id '" + id + "'");
         }
         int randomIndex = (int) (Math.random() * teams.size());
-        return teamService.toDto(teams.get(randomIndex));
+        return teams.get(randomIndex);
     }
 
     // Mappers

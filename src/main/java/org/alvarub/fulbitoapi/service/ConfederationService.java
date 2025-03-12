@@ -7,6 +7,9 @@ import org.alvarub.fulbitoapi.repository.CountryRepository;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,11 +33,13 @@ public class ConfederationService {
     @Autowired
     private TeamRepository teamRepo;
 
+    @CacheEvict(value = "confederations", allEntries = true)
     public void saveConfederation(ConfederationDTO confederationDTO) {
         Confederation confederation = toEntity(confederationDTO);
         confederationRepo.save(confederation);
     }
 
+    @Cacheable("confederations")
     public List<ConfederationResponseDTO> findAllConfederations() {
         List<Confederation> confederations = confederationRepo.findAll();
         List<ConfederationResponseDTO> confederationsResponse = new ArrayList<>();
@@ -46,6 +51,7 @@ public class ConfederationService {
         return confederationsResponse;
     }
 
+    @Cacheable(value = "confederations", key = "#id")
     public ConfederationResponseDTO findConfederationById(Long id) {
         Confederation confederation = confederationRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
@@ -53,6 +59,7 @@ public class ConfederationService {
         return toDto(confederation);
     }
 
+    @Cacheable(value = "confederationes", key = "#name")
     public ConfederationResponseDTO findConfederationByName(String name) {
         Confederation confederation = confederationRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException("Confederacion con el nombre '" + name + "' no encontrada"));
@@ -60,6 +67,7 @@ public class ConfederationService {
         return toDto(confederation);
     }
 
+    @CachePut(value = "confederations", key = "#id")
     public void editConfederation(Long id, ConfederationDTO confederationDTO) {
         Confederation existingConfederation = confederationRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
@@ -91,25 +99,23 @@ public class ConfederationService {
     }
 
     public CountryResponseDTO getRandomCountryByConfederation(Long id) {
-        Confederation confederation = confederationRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
-        List<Country> countries = confederation.getCountries();
+        ConfederationResponseDTO confederation = this.findConfederationById(id);
+        List<CountryResponseDTO> countries = confederation.getCountries();
         if (countries.isEmpty()) {
-            throw new NotFoundException("No hay paises disponibles");
+            throw new NotFoundException("No hay paises en la confederacion con id '" + id + "'");
         }
         int randomIndex = (int) (Math.random() * countries.size());
-        return countryService.toDto(countries.get(randomIndex));
+        return countries.get(randomIndex);
     }
 
     public TeamResponseDTO getRandomTeamByConfederation(Long id) {
-        Confederation confederation = confederationRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
-        List<Team> teams = confederation.getTeams();
+        ConfederationResponseDTO confederation = this.findConfederationById(id);
+        List<TeamResponseDTO> teams = confederation.getTeams();
         if (teams.isEmpty()) {
-            throw new NotFoundException("No hay equipos disponibles");
+            throw new NotFoundException("No hay equipos en la confederacion con id '" + id + "'");
         }
         int randomIndex = (int) (Math.random() * teams.size());
-        return teamService.toDto(teams.get(randomIndex));
+        return teams.get(randomIndex);
     }
 
     // Mappers

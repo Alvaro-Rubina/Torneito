@@ -7,6 +7,9 @@ import org.alvarub.fulbitoapi.repository.LeagueRepository;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,11 +33,13 @@ public class CountryService {
     @Autowired
     private TeamRepository teamRepo;
 
+    @CacheEvict(value = "countries", allEntries = true)
     public void saveCountry(CountryDTO countryDTO) {
         Country country = toEntity(countryDTO);
         countryRepo.save(country);
     }
 
+    @Cacheable("countries")
     public List<CountryResponseDTO> findAllCountries() {
         List<Country> countries = countryRepo.findAll();
         List<CountryResponseDTO> countriesResponse = new ArrayList<>();
@@ -46,6 +51,7 @@ public class CountryService {
         return countriesResponse;
     }
 
+    @Cacheable(value = "countries", key = "#id")
     public CountryResponseDTO findCountryById(Long id) {
         Country country = countryRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("País con el id '" + id + "' no encontrado"));
@@ -53,6 +59,7 @@ public class CountryService {
         return toDto(country);
     }
 
+    @Cacheable(value = "countries", key = "#name")
     public CountryResponseDTO findCountryByName(String name) {
         Country country = countryRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException("País con el nombre '" + name + "' no encontrado"));
@@ -60,6 +67,7 @@ public class CountryService {
         return toDto(country);
     }
 
+    @CachePut(value = "countries", key = "#id")
     public void editCountry(Long id, CountryDTO countryDTO) {
         Country existingCountry = countryRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("País con el id '" + id + "' no encontrado"));
