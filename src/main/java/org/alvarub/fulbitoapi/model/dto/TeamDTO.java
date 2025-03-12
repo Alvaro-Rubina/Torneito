@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.io.Serializable;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-public class TeamDTO {
+public class TeamDTO implements Serializable {
 
     @Schema(example = "Boca Juniors") @NotBlank(message = "El nombre es obligatorio")
     private String name;

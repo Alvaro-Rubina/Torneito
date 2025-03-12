@@ -7,6 +7,9 @@ import org.alvarub.fulbitoapi.repository.LeagueRepository;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,11 +33,13 @@ public class CountryService {
     @Autowired
     private TeamRepository teamRepo;
 
+    @CacheEvict(value = "countries", allEntries = true)
     public void saveCountry(CountryDTO countryDTO) {
         Country country = toEntity(countryDTO);
         countryRepo.save(country);
     }
 
+    @Cacheable("countries")
     public List<CountryResponseDTO> findAllCountries() {
         List<Country> countries = countryRepo.findAll();
         List<CountryResponseDTO> countriesResponse = new ArrayList<>();
@@ -46,6 +51,7 @@ public class CountryService {
         return countriesResponse;
     }
 
+    @Cacheable(value = "countries", key = "#id")
     public CountryResponseDTO findCountryById(Long id) {
         Country country = countryRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("País con el id '" + id + "' no encontrado"));
@@ -53,6 +59,7 @@ public class CountryService {
         return toDto(country);
     }
 
+    @Cacheable(value = "countries", key = "#name")
     public CountryResponseDTO findCountryByName(String name) {
         Country country = countryRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException("País con el nombre '" + name + "' no encontrado"));
@@ -60,14 +67,41 @@ public class CountryService {
         return toDto(country);
     }
 
+    @CachePut(value = "countries", key = "#id")
     public void editCountry(Long id, CountryDTO countryDTO) {
-        if (countryRepo.existsById(id)) {
-            Country country = toEntity(countryDTO);
-            country.setId(id);
-            countryRepo.save(country);
-        } else {
-            throw new NotFoundException("País con el id '" + id + "' no encontrado");
+        Country existingCountry = countryRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("País con el id '" + id + "' no encontrado"));
+
+        if (countryDTO.getName() != null) {
+            existingCountry.setName(countryDTO.getName());
         }
+        if (countryDTO.getFlag() != null) {
+            existingCountry.setFlag(countryDTO.getFlag());
+        }
+        if (countryDTO.getContinent() != null) {
+            existingCountry.setContinent(Continent.valueOf(countryDTO.getContinent()));
+        }
+        if (countryDTO.getConfederationName() != null) {
+            existingCountry.setConfederationName(countryDTO.getConfederationName());
+        }
+        if (countryDTO.getLeagues() != null && !countryDTO.getLeagues().isEmpty()) {
+            List<League> leagues = new ArrayList<>();
+            for (String leagueName : countryDTO.getLeagues()) {
+                leagues.add(leagueRepo.findByName(leagueName)
+                        .orElseThrow(() -> new NotFoundException("Liga con el nombre '" + leagueName + "' no encontrada")));
+            }
+            existingCountry.setLeagues(leagues);
+        }
+        if (countryDTO.getTeams() != null && !countryDTO.getTeams().isEmpty()) {
+            List<Team> teams = new ArrayList<>();
+            for (String teamName : countryDTO.getTeams()) {
+                teams.add(teamRepo.findByName(teamName)
+                        .orElseThrow(() -> new NotFoundException("Equipo con el nombre '" + teamName + "' no encontrado")));
+            }
+            existingCountry.setTeams(teams);
+        }
+
+        countryRepo.save(existingCountry);
     }
 
     public TeamResponseDTO getRandomTeamByCountry(Long id) {

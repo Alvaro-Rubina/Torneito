@@ -4,13 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
 @Builder
-public class SeasonResponseDTO {
+public class SeasonResponseDTO implements Serializable {
 
     //
     @Schema(example = "1", description = "ID de la temporada")
