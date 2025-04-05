@@ -21,8 +21,11 @@ public class League {
 
     private String name;
     private String logo;
-    private String countrieName;
 
-    @OneToMany
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
+
+    @OneToMany(mappedBy = "league")
     private List<Season> seasons;
 }

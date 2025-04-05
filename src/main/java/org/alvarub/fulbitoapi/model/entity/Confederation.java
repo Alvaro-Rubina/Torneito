@@ -19,9 +19,9 @@ public class Confederation {
     private String name;
     private String logo;
 
-    @OneToMany
+    @OneToMany(mappedBy = "confederation")
     private List<Country> countries;
 
-    @OneToMany
+    @OneToMany(mappedBy = "confederation")
     private List<Team> teams;
 }

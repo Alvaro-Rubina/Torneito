@@ -19,8 +19,16 @@ public class Season {
 
     private String code; // Ejemplo: ARG-2021
     private Long year;
-    private String countrieName;
+
+    @ManyToOne
+    @JoinColumn(name = "league_id")
+    private League league;
 
     @ManyToMany
+    @JoinTable(
+            name = "season_team",
+            joinColumns = @JoinColumn(name = "season_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id")
+    )
     private List<Team> teams;
 }
