@@ -18,14 +18,10 @@ public class League {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String logo;
 
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
-
-    @OneToMany(mappedBy = "league")
-    private List<Season> seasons;
 }

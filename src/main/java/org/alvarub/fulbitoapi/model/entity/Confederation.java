@@ -18,10 +18,4 @@ public class Confederation {
     private Long id;
     private String name;
     private String logo;
-
-    @OneToMany(mappedBy = "confederation")
-    private List<Country> countries;
-
-    @OneToMany(mappedBy = "confederation")
-    private List<Team> teams;
 }

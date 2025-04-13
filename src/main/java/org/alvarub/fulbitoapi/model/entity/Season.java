@@ -16,7 +16,6 @@ public class Season {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String code; // Ejemplo: ARG-2021
     private Long year;
 
@@ -26,7 +25,7 @@ public class Season {
 
     @ManyToMany
     @JoinTable(
-            name = "season_team",
+            name = "participacion_temporada",
             joinColumns = @JoinColumn(name = "season_id"),
             inverseJoinColumns = @JoinColumn(name = "team_id")
     )
