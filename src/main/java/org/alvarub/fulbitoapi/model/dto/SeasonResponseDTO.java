@@ -23,8 +23,8 @@ public class SeasonResponseDTO implements Serializable {
     @Schema(example = "2024", description = "Año de la temporada")
     private Long year;
 
-    @Schema(example = "Argentina")
-    private String countrieName;
+    @Schema(description = "Liga a la que pertenece la temporada")
+    private LeagueResponseDTO league;
 
     @Schema(description = "Lista de equipos presentes en la temporada")
     private List<TeamResponseDTO> teams;

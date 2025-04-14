@@ -2,12 +2,10 @@ package org.alvarub.fulbitoapi.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,15 +24,8 @@ public class CountryDTO implements Serializable {
     @Schema(example = "America") @NotBlank(message = "El continente es obligatorio")
     private String continent;
 
-    @Schema(example = "Conmebol")
-    @NotBlank(message = "El nombre de la confederacion es obligatorio")
-    private String confederationName;
+    @Schema(example = "1", description = "ID de la confederacion")
+    @NotNull(message = "El ID de la confederacion es obligatorio")
+    private Long confederationId;
 
-    @Schema(example = "[\"Liga Profesional Argentina\", \"Primera Nacional Argentina\"]") @NotEmpty(message = "La lista de ligas no puede estar vacía")
-    @Size(min = 1, message = "Debe haber al menos una liga en la lista")
-    private List<String> leagues;
-
-    @Schema(example = "[\"Boca Juniors\", \"Deportivo Maipu\"]") @NotEmpty(message = "La lista de equipos no puede estar vacía")
-    @Size(min = 1, message = "Debe haber al menos un equipo en la lista")
-    private List<String> teams;
 }

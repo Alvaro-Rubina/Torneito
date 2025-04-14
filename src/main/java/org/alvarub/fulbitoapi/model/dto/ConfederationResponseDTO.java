@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,10 +20,4 @@ public class ConfederationResponseDTO implements Serializable {
 
     @Schema(example = "https://url-del-logo", description = "URL del logo de la confederacion")
     private String logo;
-
-    @Schema(description = "Paises asociados a la confederacion")
-    private List<CountryResponseDTO> countries;
-
-    @Schema(description = "Equipos asociados a la confederacion")
-    private List<TeamResponseDTO> teams;
 }

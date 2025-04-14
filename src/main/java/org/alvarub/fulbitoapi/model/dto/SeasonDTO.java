@@ -23,10 +23,11 @@ public class SeasonDTO implements Serializable {
     @Schema(example = "1") @NotNull(message = "El año es obligatorio")
     private Long year;
 
-    @Schema(example = "[\"Boca Juniors\", \"RiBer Plate\"]") @NotEmpty(message = "La lista de equipos no puede estar vacía")
-    private List<String> teams;
+    @Schema(example = "1", description = "ID de la liga a la que pertenece")
+    @NotNull(message = "El ID de la liga es obligatorio")
+    private Long leagueId;
 
-    @Schema(example = "Argentina")
-    @NotBlank(message = "El nombre del país es obligatorio")
-    private String countrieName;
+    @Schema(description = "Lista de IDs de los equipos que participan en la temporada", example = "[1, 2, 3]")
+    private List<Long> teamsIds;
+
 }

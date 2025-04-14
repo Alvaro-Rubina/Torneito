@@ -19,7 +19,9 @@ public class TeamDTO implements Serializable {
     @NotBlank(message = "El url del logo (escudo) es obligatorio")
     private String logo;
 
-    @Schema(example = "Argentina")
-    @NotBlank(message = "El nombre del país es obligatorio")
-    private String countrieName;
+    @Schema(example = "1", description = "ID de la confederación a la que pertenece")
+    private Long confederationId;
+
+    @Schema(example = "1", description = "ID del país al que pertenece")
+    private Long countryId;
 }

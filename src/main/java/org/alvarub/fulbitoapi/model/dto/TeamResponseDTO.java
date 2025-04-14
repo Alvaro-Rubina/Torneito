@@ -20,6 +20,9 @@ public class TeamResponseDTO implements Serializable {
     @Schema(example = "https://url-del-logo", description = "URL del logo (escudo) del equipo")
     private String logo;
 
-    @Schema(example = "Argentina", description = "País del equipo")
-    private String countrieName;
+    @Schema(description = "Confederación a la que pertenece el equipo")
+    private ConfederationResponseDTO confederation;
+
+    @Schema(description = "País al que pertenece el equipo")
+    private CountryResponseDTO country;
 }
