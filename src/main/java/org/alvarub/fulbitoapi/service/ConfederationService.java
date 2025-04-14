@@ -39,18 +39,6 @@ public class ConfederationService {
         confederationRepo.save(confederation);
     }
 
-    @Cacheable("confederations")
-    public List<ConfederationResponseDTO> findAllConfederations() {
-        List<Confederation> confederations = confederationRepo.findAll();
-        List<ConfederationResponseDTO> confederationsResponse = new ArrayList<>();
-
-        for (Confederation confederation: confederations) {
-            confederationsResponse.add(toDto(confederation));
-        }
-
-        return confederationsResponse;
-    }
-
     @Cacheable(value = "confederations", key = "#id")
     public ConfederationResponseDTO findConfederationById(Long id) {
         Confederation confederation = confederationRepo.findById(id)
@@ -67,96 +55,45 @@ public class ConfederationService {
         return toDto(confederation);
     }
 
+    @Cacheable("confederations")
+    public List<ConfederationResponseDTO> findAllConfederations() {
+        List<Confederation> confederations = confederationRepo.findAll();
+        List<ConfederationResponseDTO> confederationsDTO = new ArrayList<>();
+        for (Confederation confederation : confederations) {
+            confederationsDTO.add(toDto(confederation));
+        }
+        return confederationsDTO;
+    }
+
     @CachePut(value = "confederations", key = "#id")
     public void editConfederation(Long id, ConfederationDTO confederationDTO) {
-        Confederation existingConfederation = confederationRepo.findById(id)
+        Confederation confederation = confederationRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Confederacion con el id '" + id + "' no encontrada"));
 
-        if (confederationDTO.getName() != null) {
-            existingConfederation.setName(confederationDTO.getName());
-        }
-        if (confederationDTO.getLogo() != null) {
-            existingConfederation.setLogo(confederationDTO.getLogo());
-        }
-        if (confederationDTO.getCountries() != null && !confederationDTO.getCountries().isEmpty()) {
-            List<Country> countries = new ArrayList<>();
-            for (String countryName : confederationDTO.getCountries()) {
-                countries.add(countryRepo.findByName(countryName)
-                        .orElseThrow(() -> new NotFoundException("País con el nombre '" + countryName + "' no encontrado")));
-            }
-            existingConfederation.setCountries(countries);
-        }
-        if (confederationDTO.getTeams() != null && !confederationDTO.getTeams().isEmpty()) {
-            List<Team> teams = new ArrayList<>();
-            for (String teamName : confederationDTO.getTeams()) {
-                teams.add(teamRepo.findByName(teamName)
-                        .orElseThrow(() -> new NotFoundException("Equipo con el nombre '" + teamName + "' no encontrado")));
-            }
-            existingConfederation.setTeams(teams);
+        if (!confederation.getName().equals(confederationDTO.getName())) {
+            confederation.setName(confederationDTO.getName());
         }
 
-        confederationRepo.save(existingConfederation);
-    }
-
-    public CountryResponseDTO getRandomCountryByConfederation(Long id) {
-        ConfederationResponseDTO confederation = this.findConfederationById(id);
-        List<CountryResponseDTO> countries = confederation.getCountries();
-        if (countries.isEmpty()) {
-            throw new NotFoundException("No hay paises en la confederacion con id '" + id + "'");
+        if (!confederation.getLogo().equals(confederationDTO.getLogo())) {
+            confederation.setLogo(confederationDTO.getLogo());
         }
-        int randomIndex = (int) (Math.random() * countries.size());
-        return countries.get(randomIndex);
-    }
 
-    public TeamResponseDTO getRandomTeamByConfederation(Long id) {
-        ConfederationResponseDTO confederation = this.findConfederationById(id);
-        List<TeamResponseDTO> teams = confederation.getTeams();
-        if (teams.isEmpty()) {
-            throw new NotFoundException("No hay equipos en la confederacion con id '" + id + "'");
-        }
-        int randomIndex = (int) (Math.random() * teams.size());
-        return teams.get(randomIndex);
+        confederationRepo.save(confederation);
     }
 
     // Mappers
     private Confederation toEntity(ConfederationDTO confederationDTO) {
-        List<Country> countries = new ArrayList<>();
-        List<Team> teams = new ArrayList<>();
-
-        for (String country: confederationDTO.getCountries()) {
-            countries.add(countryRepo.findByName(country)
-                    .orElseThrow(() -> new NotFoundException("País con el nombre '" + country + "' no encontrado")));
-        }
-        for (String team: confederationDTO.getTeams()) {
-            teams.add(teamRepo.findByName(team)
-                    .orElseThrow(() -> new NotFoundException("Equipo con el nombre '" + team + "' no encontrado")));
-        }
-
-        return Confederation.builder()
-                .name(confederationDTO.getName())
-                .logo(confederationDTO.getLogo())
-                .countries(countries)
-                .teams(teams)
-                .build();
+         return Confederation.builder()
+                 .name(confederationDTO.getName())
+                 .logo(confederationDTO.getLogo())
+                 .build();
     }
 
     private ConfederationResponseDTO toDto(Confederation confederation) {
-        List<CountryResponseDTO> countriesResponse = new ArrayList<>();
-        List<TeamResponseDTO> teamsResponse = new ArrayList<>();
-
-        for (Country country: confederation.getCountries()) {
-            countriesResponse.add(countryService.toDto(country));
-        }
-        for (Team team: confederation.getTeams()) {
-            teamsResponse.add(teamService.toDto(team));
-        }
-
         return ConfederationResponseDTO.builder()
                 .id(confederation.getId())
                 .name(confederation.getName())
                 .logo(confederation.getLogo())
-                .countries(countriesResponse)
-                .teams(teamsResponse)
                 .build();
     }
 
