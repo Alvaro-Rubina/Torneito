@@ -3,8 +3,6 @@ package org.alvarub.fulbitoapi.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter

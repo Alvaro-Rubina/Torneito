@@ -28,7 +28,4 @@ public class Team {
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @ManyToMany(mappedBy = "teams")
-    private List<Season> seasons;
-
 }
