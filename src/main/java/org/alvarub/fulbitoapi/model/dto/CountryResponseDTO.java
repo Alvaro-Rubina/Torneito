@@ -25,6 +25,6 @@ public class CountryResponseDTO implements Serializable {
     private String continent;
 
     @Schema(description = "Confederacion a la que pertenece el pais")
-    private ConfederationDTO confederation;
+    private ConfederationResponseDTO confederation;
 
 }

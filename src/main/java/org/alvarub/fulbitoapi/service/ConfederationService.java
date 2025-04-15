@@ -3,8 +3,6 @@ package org.alvarub.fulbitoapi.service;
 import org.alvarub.fulbitoapi.model.dto.*;
 import org.alvarub.fulbitoapi.model.entity.*;
 import org.alvarub.fulbitoapi.repository.ConfederationRepository;
-import org.alvarub.fulbitoapi.repository.CountryRepository;
-import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,18 +18,6 @@ public class ConfederationService {
 
     @Autowired
     private ConfederationRepository confederationRepo;
-
-    @Autowired
-    private CountryService countryService;
-
-    @Autowired
-    private CountryRepository countryRepo;
-
-    @Autowired
-    private TeamService teamService;
-
-    @Autowired
-    private TeamRepository teamRepo;
 
     @CacheEvict(value = "confederations", allEntries = true)
     public void saveConfederation(ConfederationDTO confederationDTO) {
@@ -89,7 +75,7 @@ public class ConfederationService {
                  .build();
     }
 
-    private ConfederationResponseDTO toDto(Confederation confederation) {
+    public ConfederationResponseDTO toDto(Confederation confederation) {
         return ConfederationResponseDTO.builder()
                 .id(confederation.getId())
                 .name(confederation.getName())
