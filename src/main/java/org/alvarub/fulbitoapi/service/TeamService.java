@@ -3,6 +3,8 @@ package org.alvarub.fulbitoapi.service;
 import org.alvarub.fulbitoapi.model.dto.TeamDTO;
 import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Team;
+import org.alvarub.fulbitoapi.repository.ConfederationRepository;
+import org.alvarub.fulbitoapi.repository.CountryRepository;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,33 +22,20 @@ public class TeamService {
     @Autowired
     private TeamRepository teamRepo;
 
-    public boolean existsByName(String name) {
-        return teamRepo.findByName(name).isPresent();
-    }
+    @Autowired
+    private ConfederationRepository confederationRepo;
+    @Autowired
+    private ConfederationService confederationService;
+
+    @Autowired
+    private CountryRepository countryRepo;
+    @Autowired
+    private CountryService countryService;
 
     @CacheEvict(value = "teams", allEntries = true)
     public void saveTeam(TeamDTO teamDTO) {
         Team team = toEntity(teamDTO);
         teamRepo.save(team);
-    }
-
-    @CacheEvict(value = "teams", allEntries = true)
-    public void saveAllTeams(List<TeamDTO> teamsDTO) {
-        List<Team> teams = new ArrayList<>();
-        for (TeamDTO teamDTO: teamsDTO) {
-            teams.add(toEntity(teamDTO));
-        }
-        teamRepo.saveAll(teams);
-    }
-
-    @Cacheable("teams")
-    public List<TeamResponseDTO> findAllTeams() {
-        List<Team> teams = teamRepo.findAll();
-        List<TeamResponseDTO> teamsResponse = new ArrayList<>();
-        for (Team team: teams) {
-            teamsResponse.add(toDto(team));
-        }
-        return teamsResponse;
     }
 
     @Cacheable(value = "teams", key = "#id")
@@ -65,31 +54,39 @@ public class TeamService {
         return toDto(team);
     }
 
-    @CachePut(value = "teams", key = "#id")
-    public void editTeam(Long id, TeamDTO teamDTO) {
-        Team existingTeam = teamRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Equipo con el id '" + id + "' no encontrado"));
-
-        if (teamDTO.getName() != null) {
-            existingTeam.setName(teamDTO.getName());
+    @Cacheable("teams")
+    public List<TeamResponseDTO> findAllTeams() {
+        List<Team> teams = teamRepo.findAll();
+        List<TeamResponseDTO> teamsDTO = new ArrayList<>();
+        for (Team team: teams) {
+            teamsDTO.add(toDto(team));
         }
-        if (teamDTO.getLogo() != null) {
-            existingTeam.setLogo(teamDTO.getLogo());
-        }
-        if (teamDTO.getCountrieName() != null) {
-            existingTeam.setCountrieName(teamDTO.getCountrieName());
-        }
-
-        teamRepo.save(existingTeam);
+        return teamsDTO;
     }
 
-    public TeamResponseDTO getRandomTeam() {
-        List<TeamResponseDTO> teams = this.findAllTeams();
-        if (teams.isEmpty()) {
-            throw new NotFoundException("No hay equipos disponibles");
+    @CachePut(value = "teams", key = "#id")
+    public void editTeam(Long id, TeamDTO teamDTO) {
+        Team team = teamRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Equipo con el id '" + id + "' no encontrado"));
+
+        if (!team.getName().equals(teamDTO.getName())) {
+            team.setName(teamDTO.getName());
         }
-        int randomIndex = (int) (Math.random() * teams.size());
-        return teams.get(randomIndex);
+
+        if (!team.getLogo().equals(teamDTO.getLogo())) {
+            team.setLogo(teamDTO.getLogo());
+        }
+
+        if (!team.getConfederation().getId().equals(teamDTO.getConfederationId())) {
+            team.setConfederation(confederationRepo.findById(teamDTO.getConfederationId())
+                    .orElseThrow(() -> new NotFoundException("Confederación con el id '" + teamDTO.getConfederationId() + "' no encontrada")));
+        }
+
+        if (!team.getCountry().getId().equals(teamDTO.getCountryId())) {
+            team.setCountry(countryRepo.findById(teamDTO.getCountryId())
+                    .orElseThrow(() -> new NotFoundException("País con el id '" + teamDTO.getCountryId() + "' no encontrado")));
+        }
+
     }
 
     // Mappers
@@ -97,7 +94,10 @@ public class TeamService {
         return Team.builder()
                 .name(teamDTO.getName())
                 .logo(teamDTO.getLogo())
-                .countrieName(teamDTO.getCountrieName())
+                .confederation(confederationRepo.findById(teamDTO.getConfederationId())
+                        .orElseThrow(() -> new NotFoundException("Confederación con el id '" + teamDTO.getConfederationId() + "' no encontrada")))
+                .country(countryRepo.findById(teamDTO.getCountryId())
+                        .orElseThrow(() -> new NotFoundException("País con el id '" + teamDTO.getCountryId() + "' no encontrado")))
                 .build();
     }
 
@@ -106,7 +106,8 @@ public class TeamService {
                 .id(team.getId())
                 .name(team.getName())
                 .logo(team.getLogo())
-                .countrieName(team.getCountrieName())
+                .confederation(confederationService.toDto(team.getConfederation()))
+                .country(countryService.toDto(team.getCountry()))
                 .build();
     }
 
