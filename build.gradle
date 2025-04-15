@@ -34,8 +34,6 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// OpenApi
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
-	// Jsoup
-	implementation 'org.jsoup:jsoup:1.19.1'
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.3'
 
