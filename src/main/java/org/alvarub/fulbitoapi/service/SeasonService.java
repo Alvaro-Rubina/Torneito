@@ -2,24 +2,19 @@ package org.alvarub.fulbitoapi.service;
 
 import org.alvarub.fulbitoapi.model.dto.SeasonDTO;
 import org.alvarub.fulbitoapi.model.dto.SeasonResponseDTO;
-import org.alvarub.fulbitoapi.model.dto.TeamDTO;
 import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Season;
 import org.alvarub.fulbitoapi.model.entity.Team;
+import org.alvarub.fulbitoapi.repository.LeagueRepository;
 import org.alvarub.fulbitoapi.repository.SeasonRepository;
 import org.alvarub.fulbitoapi.repository.TeamRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,25 +25,19 @@ public class SeasonService {
     private SeasonRepository seasonRepo;
 
     @Autowired
+    private TeamRepository teamRepo;
+    @Autowired
     private TeamService teamService;
 
     @Autowired
-    private TeamRepository teamRepo;
+    private LeagueRepository leagueRepo;
+    @Autowired
+    private LeagueService leagueService;
 
     @CacheEvict(value = "seasons", allEntries = true)
     public void saveSeason(SeasonDTO seasonDTO) {
         Season season = toEntity(seasonDTO);
         seasonRepo.save(season);
-    }
-
-    @Cacheable("seasons")
-    public List<SeasonResponseDTO> findAllSeasons() {
-        List<Season> seasons = seasonRepo.findAll();
-        List<SeasonResponseDTO> seasonsResponse = new ArrayList<>();
-        for (Season season: seasons) {
-            seasonsResponse.add(toDto(season));
-        }
-        return seasonsResponse;
     }
 
     @Cacheable(value = "seasons", key = "#id")
@@ -67,109 +56,82 @@ public class SeasonService {
         return toDto(season);
     }
 
-    @CachePut(value = "seasons", key = "#id")
-    public void editSeason(Long id, SeasonDTO seasonDTO) {
-        Season existingSeason = seasonRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
-
-        if (seasonDTO.getCode() != null) {
-            existingSeason.setCode(seasonDTO.getCode());
+    @Cacheable("seasons")
+    public List<SeasonResponseDTO> findAllSeasons() {
+        List<Season> seasons = seasonRepo.findAll();
+        List<SeasonResponseDTO> seasonsResponse = new ArrayList<>();
+        for (Season season: seasons) {
+            seasonsResponse.add(toDto(season));
         }
-        if (seasonDTO.getYear() != null) {
-            existingSeason.setYear(seasonDTO.getYear());
-        }
-        if (seasonDTO.getCountrieName() != null) {
-            existingSeason.setCountrieName(seasonDTO.getCountrieName());
-        }
-        if (seasonDTO.getTeams() != null && !seasonDTO.getTeams().isEmpty()) {
-            List<Team> teams = new ArrayList<>();
-            for (String teamName : seasonDTO.getTeams()) {
-                teams.add(teamRepo.findByName(teamName)
-                        .orElseThrow(() -> new NotFoundException("Equipo '" + teamName + "' no encontrado")));
-            }
-            existingSeason.setTeams(teams);
-        }
-
-        seasonRepo.save(existingSeason);
+        return seasonsResponse;
     }
 
-    public TeamResponseDTO getRandomTeamBySeason(Long id) {
-        SeasonResponseDTO season = this.findSeasonById(id);
-        List<TeamResponseDTO> teams = season.getTeams();
-        if(teams.isEmpty()) {
-            throw new NotFoundException("No hay equipos en la temporada con el id '" + id + "'");
+    @CachePut(value = "seasons", key = "#id")
+    public void editSeason(Long id, SeasonDTO seasonDTO) {
+        Season season = seasonRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
+
+        if (!season.getCode().equals(seasonDTO.getCode())) {
+            season.setCode(seasonDTO.getCode());
         }
-        int randomIndex = (int) (Math.random() * teams.size());
-        return teams.get(randomIndex);
+
+        if (!season.getYear().equals(seasonDTO.getYear())) {
+            season.setYear(seasonDTO.getYear());
+        }
+
+        if (!season.getLeague().getId().equals(seasonDTO.getLeagueId())) {
+            season.setLeague(leagueRepo.findById(seasonDTO.getLeagueId())
+                    .orElseThrow(() -> new NotFoundException("Liga con el id '" + seasonDTO.getLeagueId() + "' no encontrada")));
+        }
+
+        // Actualizar equipos
+        List<Team> currentTeams = season.getTeams();
+        List<Long> newTeamIds = seasonDTO.getTeamsIds();
+
+        // Equipos a eliminar
+        currentTeams.removeIf(team -> !newTeamIds.contains(team.getId()));
+
+        // Equipos a agregar
+        for (Long teamId : newTeamIds) {
+            if (currentTeams.stream().noneMatch(team -> team.getId().equals(teamId))) {
+                Team team = teamRepo.findById(teamId)
+                        .orElseThrow(() -> new NotFoundException("Equipo con el id '" + teamId + "' no encontrado"));
+                currentTeams.add(team);
+            }
+        }
+
     }
 
     // Mappers
     private Season toEntity(SeasonDTO seasonDTO) {
         List<Team> teams = new ArrayList<>();
-
-        for (String team: seasonDTO.getTeams()) {
-            teams.add(teamRepo.findByName(team)
-                    .orElseThrow(() -> new NotFoundException("Equipo '" + team + "' no encontrado")));
+        for (Long teamId: seasonDTO.getTeamsIds()) {
+            Team team = teamRepo.findById(teamId)
+                    .orElseThrow(() -> new NotFoundException("Equipo con el id '" + teamId + "' no encontrado"));
+            teams.add(team);
         }
 
         return Season.builder()
                 .code(seasonDTO.getCode())
                 .year(seasonDTO.getYear())
-                .countrieName(seasonDTO.getCountrieName())
+                .league(leagueRepo.findById(seasonDTO.getLeagueId())
+                        .orElseThrow(() -> new NotFoundException("Liga con el id '" + seasonDTO.getLeagueId() + "' no encontrada")))
                 .teams(teams)
                 .build();
     }
 
     public SeasonResponseDTO toDto(Season season) {
-        List<TeamResponseDTO> teamsResponse = new ArrayList<>();
+        List<TeamResponseDTO> teamsDTO = new ArrayList<>();
         for (Team team: season.getTeams()) {
-            teamsResponse.add(teamService.toDto(team));
+            teamsDTO.add(teamService.toDto(team));
         }
 
         return SeasonResponseDTO.builder()
                 .id(season.getId())
                 .code(season.getCode())
                 .year(season.getYear())
-                .countrieName(season.getCountrieName())
-                .teams(teamsResponse)
+                .league(leagueService.toDto(season.getLeague()))
+                .teams(teamsDTO)
                 .build();
-    }
-
-    // Jsoup methods
-    public void scrapeAndSaveSeason(String seasonPath, SeasonDTO seasonDTO) throws IOException {
-        final String BASE_URL = "https://www.bdfutbol.com/";
-        String url = BASE_URL + "es/t/" + seasonPath;
-
-        Document doc = Jsoup.connect(url).get();
-        Elements rows = doc.select("table#classific tbody tr");
-        List<String> teams = new ArrayList<>();
-        List<TeamDTO> teamDTOs = new ArrayList<>();
-
-        // Recorro los equipos y extraigo el nombre y url del escudo
-        for (Element row : rows) {
-            String teamName = row.select("td.text-left a").text();
-            String logoUrl = BASE_URL + row.select("td.fit.pr-0 img").attr("src");
-
-            // Se guarda el nombre del equipo en la lista teams y si el equipo no está en la base de datos, se persiste en esta.
-            if (!teamName.isEmpty()) {
-                teams.add(teamName);
-
-                if (!teamService.existsByName(teamName)) {
-                    TeamDTO teamDTO = TeamDTO.builder().
-                            name(teamName)
-                            .countrieName(seasonDTO.getCountrieName())
-                            .logo(logoUrl)
-                            .build();
-                    teamDTOs.add(teamDTO);
-                }
-            }
-        }
-
-        // Guardo los equipos NUEVOS en la bd
-        teamService.saveAllTeams(teamDTOs);
-
-        // Guardo el dto en la bd
-        seasonDTO.setTeams(teams);
-        this.saveSeason(seasonDTO);
     }
 }
