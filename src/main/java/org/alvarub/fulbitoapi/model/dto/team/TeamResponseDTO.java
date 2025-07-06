@@ -1,7 +1,9 @@
-package org.alvarub.fulbitoapi.model.dto;
+package org.alvarub.fulbitoapi.model.dto.team;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.alvarub.fulbitoapi.model.dto.confederation.ConfederationResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.country.CountryResponseDTO;
 
 import java.io.Serializable;
 

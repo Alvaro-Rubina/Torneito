@@ -1,6 +1,7 @@
 package org.alvarub.fulbitoapi.service;
 
-import org.alvarub.fulbitoapi.model.dto.*;
+import org.alvarub.fulbitoapi.model.dto.confederation.ConfederationDTO;
+import org.alvarub.fulbitoapi.model.dto.confederation.ConfederationResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.*;
 import org.alvarub.fulbitoapi.repository.ConfederationRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;

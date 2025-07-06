@@ -1,4 +1,4 @@
-package org.alvarub.fulbitoapi.model.entity;
+package org.alvarub.fulbitoapi.model.enums;
 
 public enum Continent {
 

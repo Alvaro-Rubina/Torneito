@@ -1,7 +1,7 @@
 package org.alvarub.fulbitoapi.service;
 
-import org.alvarub.fulbitoapi.model.dto.TeamDTO;
-import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.team.TeamDTO;
+import org.alvarub.fulbitoapi.model.dto.team.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Team;
 import org.alvarub.fulbitoapi.repository.ConfederationRepository;
 import org.alvarub.fulbitoapi.repository.CountryRepository;

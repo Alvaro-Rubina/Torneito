@@ -1,4 +1,4 @@
-package org.alvarub.fulbitoapi.model.dto;
+package org.alvarub.fulbitoapi.model.dto.season;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

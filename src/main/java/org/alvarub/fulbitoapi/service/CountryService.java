@@ -1,7 +1,9 @@
 package org.alvarub.fulbitoapi.service;
 
-import org.alvarub.fulbitoapi.model.dto.*;
+import org.alvarub.fulbitoapi.model.dto.country.CountryDTO;
+import org.alvarub.fulbitoapi.model.dto.country.CountryResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.*;
+import org.alvarub.fulbitoapi.model.enums.Continent;
 import org.alvarub.fulbitoapi.repository.ConfederationRepository;
 import org.alvarub.fulbitoapi.repository.CountryRepository;
 import org.alvarub.fulbitoapi.utils.exception.NotFoundException;

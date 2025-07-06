@@ -1,8 +1,6 @@
 package org.alvarub.fulbitoapi.service;
 
-import org.alvarub.fulbitoapi.model.dto.SeasonDTO;
-import org.alvarub.fulbitoapi.model.dto.SeasonResponseDTO;
-import org.alvarub.fulbitoapi.model.dto.TeamResponseDTO;
+import org.alvarub.fulbitoapi.model.dto.team.TeamResponseDTO;
 import org.alvarub.fulbitoapi.model.entity.Season;
 import org.alvarub.fulbitoapi.model.entity.Team;
 import org.alvarub.fulbitoapi.repository.LeagueRepository;
@@ -35,13 +33,13 @@ public class SeasonService {
     private LeagueService leagueService;
 
     @CacheEvict(value = "seasons", allEntries = true)
-    public void saveSeason(SeasonDTO seasonDTO) {
+    public void saveSeason(season.SeasonDTO seasonDTO) {
         Season season = toEntity(seasonDTO);
         seasonRepo.save(season);
     }
 
     @Cacheable(value = "seasons", key = "#id")
-    public SeasonResponseDTO findSeasonById(Long id) {
+    public season.SeasonResponseDTO findSeasonById(Long id) {
         Season season = seasonRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
 
@@ -49,7 +47,7 @@ public class SeasonService {
     }
 
     @Cacheable(value = "seasons", key = "#code")
-    public SeasonResponseDTO findSeasonByCode(String code) {
+    public season.SeasonResponseDTO findSeasonByCode(String code) {
         Season season = seasonRepo.findByCode(code)
                 .orElseThrow(() -> new NotFoundException("Temporada con el código '" + code + "' no encontrada"));
 
@@ -57,9 +55,9 @@ public class SeasonService {
     }
 
     @Cacheable("seasons")
-    public List<SeasonResponseDTO> findAllSeasons() {
+    public List<season.SeasonResponseDTO> findAllSeasons() {
         List<Season> seasons = seasonRepo.findAll();
-        List<SeasonResponseDTO> seasonsResponse = new ArrayList<>();
+        List<season.SeasonResponseDTO> seasonsResponse = new ArrayList<>();
         for (Season season: seasons) {
             seasonsResponse.add(toDto(season));
         }
@@ -67,7 +65,7 @@ public class SeasonService {
     }
 
     @CachePut(value = "seasons", key = "#id")
-    public void editSeason(Long id, SeasonDTO seasonDTO) {
+    public void editSeason(Long id, season.SeasonDTO seasonDTO) {
         Season season = seasonRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Temporada con el id '" + id + "' no encontrada"));
 
@@ -103,7 +101,7 @@ public class SeasonService {
     }
 
     // Mappers
-    private Season toEntity(SeasonDTO seasonDTO) {
+    private Season toEntity(season.SeasonDTO seasonDTO) {
         List<Team> teams = new ArrayList<>();
         for (Long teamId: seasonDTO.getTeamsIds()) {
             Team team = teamRepo.findById(teamId)
@@ -120,13 +118,13 @@ public class SeasonService {
                 .build();
     }
 
-    public SeasonResponseDTO toDto(Season season) {
+    public season.SeasonResponseDTO toDto(Season season) {
         List<TeamResponseDTO> teamsDTO = new ArrayList<>();
         for (Team team: season.getTeams()) {
             teamsDTO.add(teamService.toDto(team));
         }
 
-        return SeasonResponseDTO.builder()
+        return org.alvarub.fulbitoapi.model.dto.season.SeasonResponseDTO.builder()
                 .id(season.getId())
                 .code(season.getCode())
                 .year(season.getYear())
