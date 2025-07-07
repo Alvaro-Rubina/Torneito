@@ -2,6 +2,7 @@ package org.alvarub.fulbitoapi.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.alvarub.fulbitoapi.model.enums.Continent;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,5 +23,4 @@ public class Country {
     @ManyToOne
     @JoinColumn(name = "confederation_id")
     private Confederation confederation;
-
 }
